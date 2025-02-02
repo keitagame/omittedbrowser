@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using Gecko;
 using System.Drawing;
+using System.Runtime.InteropServices;
 namespace GeckoFxBrowser
 {
     public class MainForm : Form
@@ -27,7 +28,7 @@ namespace GeckoFxBrowser
             this.Text = "ob";
             this.Size = new System.Drawing.Size(1900, 1200);
             // Gecko エンジンの初期化
-            Xpcom.Initialize("Geckofx45.45.0.34/content/Firefox"); // path_to_xulrunner を適切なパスに置き換えてください
+            Xpcom.Initialize("Geckofx60.64.60.0.56/content/Firefox"); // path_to_xulrunner を適切なパスに置き換えてください
            tabControl = new TabControl();
         destroybutton = new Button();
         destroybutton.Text = "✕";
@@ -61,7 +62,7 @@ tabControl.DrawItem += new DrawItemEventHandler(tabControl_DrawItem);
          
          
         
-         tabControl.TabPages.Add(tabPage1);
+         
            tabControl.Size = new System.Drawing.Size(1900, 1150);
          this.Controls.Add(tabControl);
          
@@ -119,6 +120,7 @@ private void AddButton_Click(object sender, EventArgs e)
     {
         int newIndex = tabControl.TabPages.Count + 1;
         TabPage newTabPage = new TabPage("tab" + newIndex);
+          newTabPage.Font = new Font("Arial", 8);
           newTabPage.BackColor = Color.Orange;
         newTabPage.Controls.Add(geckoWebBrowser =new GeckoWebBrowser
             {
@@ -129,7 +131,7 @@ private void AddButton_Click(object sender, EventArgs e)
                  
             });
         tabControl.TabPages.Add(newTabPage);
-         geckoWebBrowser.Navigate("");
+         geckoWebBrowser.Navigate("https://github.com/keitagame/omittedbrowser");
     }
        
        private void TextBox_KeyDown(object sender, KeyEventArgs e)
@@ -146,9 +148,28 @@ private void AddButton_Click(object sender, EventArgs e)
             }
             }
         }
+        const int LOGPIXELSX = 88;
+    const int LOGPIXELSY = 90;
+
+    [DllImport("user32.dll")]
+    extern static bool SetProcessDPIAware();
+
+    [DllImport("user32.dll")]
+    extern static IntPtr GetWindowDC(IntPtr hwnd);
+
+    [DllImport("gdi32.dll")]
+    extern static int GetDeviceCaps(IntPtr hdc, int index);
+
+    [DllImport("user32.dll")]
+    extern static int ReleaseDC(IntPtr hwnd, IntPtr hdc);
         [STAThread]
         public static void Main()
         {
+           SetProcessDPIAware();
+        var hdc = GetWindowDC(IntPtr.Zero);
+        Console.WriteLine("DpiX: {0}", GetDeviceCaps(hdc, LOGPIXELSX));
+        Console.WriteLine("DpiY: {0}", GetDeviceCaps(hdc, LOGPIXELSY));
+        ReleaseDC(IntPtr.Zero, hdc);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
