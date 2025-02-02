@@ -1,4 +1,3 @@
-
 using System;
 using System.Windows.Forms;
 using Gecko;
@@ -7,6 +6,7 @@ namespace GeckoFxBrowser
 {
     public class MainForm : Form
     {
+       
         private GeckoWebBrowser geckoWebBrowser;
          private TextBox textBox;
         private TabControl tabControl;
@@ -16,7 +16,8 @@ namespace GeckoFxBrowser
         {
             // フォームの設定
             
-          
+          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+
            this.textBox = new TextBox();
             this.textBox.Location = new System.Drawing.Point(20, 60);
             this.textBox.Size = new System.Drawing.Size(700, 20);
@@ -40,9 +41,13 @@ namespace GeckoFxBrowser
          this.Controls.Add(addButton);
         // デフォルトのタブページ
         TabPage tabPage1 = new TabPage("start");
-       tabControl.ItemSize = new System.Drawing.Size(190, 50); 
-
-        
+         tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
+          tabControl.SizeMode = TabSizeMode.Fixed;
+          tabControl.ItemSize = new System.Drawing.Size(190, 50); 
+     
+tabControl.DrawItem += new DrawItemEventHandler(tabControl_DrawItem);
+   tabControl.DrawItem += new DrawItemEventHandler(tabControl_DrawItems);
+     
 
         // コントロールの配置
        
@@ -51,7 +56,7 @@ namespace GeckoFxBrowser
             {
                Top = 50,
                 Width = 1900,
-                Height = 1150
+                Height = 100
             };
          
          
@@ -60,6 +65,43 @@ namespace GeckoFxBrowser
            tabControl.Size = new System.Drawing.Size(1900, 1150);
          this.Controls.Add(tabControl);
          
+         
+        }
+       
+     private void tabControl_DrawItem(object sender, DrawItemEventArgs e)
+{
+    
+    TabPage tabPage = tabControl.TabPages[e.Index];
+  
+            
+    Rectangle tabRect = tabControl.GetTabRect(e.Index);
+    tabRect.Inflate(-6, 2);
+     
+    if (e.Index == tabControl.SelectedIndex)
+    {
+          
+        e.Graphics.FillRectangle(Brushes.Orange, tabRect);
+    }
+    else
+    {
+        e.Graphics.FillRectangle(Brushes.LightGray, tabRect);
+       
+    }
+   
+    TextRenderer.DrawText(e.Graphics, tabPage.Text, tabPage.Font, tabRect, tabPage.ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
+     
+}
+
+private void tabControl_DrawItems(object sender, DrawItemEventArgs e)
+{
+  
+}
+private void t(object sender, PaintEventArgs e)
+        {
+          Console.Write("a");
+            // タブストリップの背景を黒く塗りつぶす
+            
+            
         }
   private void tabdestroy(object sender, EventArgs e)
     {
@@ -77,23 +119,19 @@ private void AddButton_Click(object sender, EventArgs e)
     {
         int newIndex = tabControl.TabPages.Count + 1;
         TabPage newTabPage = new TabPage("tab" + newIndex);
+          newTabPage.BackColor = Color.Orange;
         newTabPage.Controls.Add(geckoWebBrowser =new GeckoWebBrowser
             {
                Top = 50,
-                Width = 1900,
+              Left = 20,
+                Width = 1840,
                 Height = 1150
                  
             });
         tabControl.TabPages.Add(newTabPage);
          geckoWebBrowser.Navigate("");
     }
-        protected override void OnLoad(EventArgs e)
-        {
-              
-            base.OnLoad(e);
-            // 指定した URL にナビゲート
-            
-        }
+       
        private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
