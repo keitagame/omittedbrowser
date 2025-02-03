@@ -1,3 +1,4 @@
+
 using System;
 using System.Windows.Forms;
 using Gecko;
@@ -13,6 +14,7 @@ namespace GeckoFxBrowser
         private TabControl tabControl;
     private Button addButton;
       private Button destroybutton;
+        private Button back;
         public MainForm()
         {
             // フォームの設定
@@ -36,6 +38,10 @@ namespace GeckoFxBrowser
       destroybutton.Size =new System.Drawing.Size(100, 30);
         destroybutton.Location = new System.Drawing.Point(900, 60);
            this.Controls.Add(destroybutton);
+           back = new Button() { Text = "←",Top = 60,Left = 1000 };
+            back.Size =new System.Drawing.Size(50, 30);
+            back.Click += bk;
+         this.Controls.Add(back);
            addButton = new Button() { Text = "+",Top = 60,Left = 750 };
             addButton.Size =new System.Drawing.Size(100, 30);
             addButton.Click += AddButton_Click;
@@ -133,7 +139,20 @@ private void AddButton_Click(object sender, EventArgs e)
         tabControl.TabPages.Add(newTabPage);
          geckoWebBrowser.Navigate("https://github.com/keitagame/omittedbrowser");
     }
-       
+       private void bk(object sender, EventArgs e)
+        {
+           
+               TabPage activeTab = tabControl.SelectedTab;
+            
+                GeckoWebBrowser geckoWebBrowsers = (GeckoWebBrowser)activeTab.Controls[0];
+                
+            if (geckoWebBrowsers.CanGoBack)
+            {
+                geckoWebBrowsers.GoBack();
+            }
+                
+           
+        }
        private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
